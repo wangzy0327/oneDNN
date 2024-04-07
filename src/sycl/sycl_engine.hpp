@@ -97,7 +97,7 @@ inline std::vector<::sycl::device> get_sycl_devices(
 
 #ifdef DNNL_SYCL_BANG
     const uint32_t vendor_id
-            = ((dev_type == ::sycl::info::device_type::gpu) ? 0x10DE : intel_vendor_id);    // I don't know, so just use nvidia's id
+            = ((dev_type == ::sycl::info::device_type::gpu) ? 0xcabc : intel_vendor_id);    // I don't know, so just use nvidia's id
             
 #endif
 

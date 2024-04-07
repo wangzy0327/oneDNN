@@ -6,7 +6,7 @@
 
 #include <CL/sycl.hpp>
 #include <CL/sycl/backend/cnrt.hpp>   
-#include <cnmlrt.h>
+// #include <cnmlrt.h>
 #include <cn_api.h>
 
 #include "gpu/cambricon/sycl_bang_engine.hpp"

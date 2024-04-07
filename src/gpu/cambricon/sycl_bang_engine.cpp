@@ -29,7 +29,7 @@ namespace cambricon {
 
 
 bool is_cambricon_gpu(const cl::sycl::device &dev) {
-    constexpr int cambricon_vendor_id = 0x10DE;
+    constexpr int cambricon_vendor_id = 0xcabc;
     if(dev.get_info<cl::sycl::info::device::vendor_id>()!= cambricon_vendor_id)
         printf("vendor id error!\n");
     // return dev.is_gpu();

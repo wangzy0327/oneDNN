@@ -55,10 +55,12 @@ status_t sycl_bang_stream_t::init() {
         if (!args_ok) return status::invalid_arguments;
 
         auto queue_context = get_underlying_context();
-       cnrtDev_t queue_device = compat::get_native<cnrtDev_t>(sycl_dev);
+        // cnrtDev_t queue_device = compat::get_native<cnrtDev_t>(sycl_dev);
+        CNdev queue_device = compat::get_native<CNdev>(sycl_dev);
 
         auto engine_context = sycl_engine.get_underlying_context();
-        auto engine_device = compat::get_native<cnrtDev_t>(sycl_engine.device());
+        // auto engine_device = compat::get_native<cnrtDev_t>(sycl_engine.device());
+        auto engine_device = compat::get_native<CNdev>(sycl_engine.device());
 
         stream_t *service_stream;
         CHECK(sycl_engine.get_service_stream(service_stream));

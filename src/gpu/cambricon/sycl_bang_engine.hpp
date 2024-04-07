@@ -2,7 +2,7 @@
 #define GPU_CAMBRICON_SYCL_BANG_ENGINE_HPP
 
 #include <cnnl.h>
-#include <cnmlrt.h>
+// #include <cnmlrt.h>
 #include <cn_api.h>
 
 //#include <cnnl/cnnl.h>

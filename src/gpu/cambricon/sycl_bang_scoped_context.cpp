@@ -11,7 +11,14 @@ bang_sycl_scoped_context_handler_t::bang_sycl_scoped_context_handler_t(
     : need_to_recover_(false) {
     try {
         auto desired = engine.get_underlying_context();
-        BANG_EXECUTE_FUNC(cnCtxGetCurrent, &original_);
+        CNresult ret = cnCtxGetCurrent(&original_);
+        if (ret != CN_SUCCESS) { 
+            throw bang_error(std::string("At :") 
+                            + std::string(BANG_ERROR_LOCATION) 
+                            + std::string(" : "), 
+                    ret); 
+        } 
+        // BANG_EXECUTE_FUNC(cnCtxGetCurrent, &original_);
 
         if (original_ != desired) {
             // Sets the desired context as the active one for the thread

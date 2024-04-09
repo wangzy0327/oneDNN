@@ -71,12 +71,17 @@ sycl_bang_engine_t::sycl_bang_engine_t(
 status_t sycl_bang_engine_t::set_cnnl_handle() {
     bang_sycl_scoped_context_handler_t sc(*this);
     cnnlHandle_t handle;
-    CHECK(CNNL_EXECUTE_FUNC_S(cnnlCreate, &handle));
+    cnnlStatus_t err = cnnlCreate(&handle);
+    if (err != CNNL_STATUS_SUCCESS) { return cnnl_to_dnnl_status(err); } 
+    // CHECK(CNNL_EXECUTE_FUNC_S(cnnlCreate, &handle));
     cnnl_handle_.set(
             std::unique_ptr<cnnlHandle_t, void (*)(cnnlHandle_t *)>(
                     new cnnlHandle_t(handle), [](cnnlHandle_t *h) {
-                        if (h != nullptr)
-                            CNNL_EXECUTE_FUNC_V(cnnlDestroy, *h);
+                        if (h != nullptr){
+                            cnnlStatus_t err = cnnlDestroy(*h);
+                            if (err != CNNL_STATUS_SUCCESS) { return cnnl_to_dnnl_status(err); }
+                            // CNNL_EXECUTE_FUNC_V(cnnlDestroy, *h);
+                        }
                         delete h;
                     }));
     handle = nullptr;
@@ -102,14 +107,22 @@ status_t sycl_bang_engine_t::underlying_context_type() {
     // in  is_primary_context_;
     CNcontext primary;
     CNdev device_current;   // both driver and runtime api use uint64 as device type , TODO: use driver api
-    CNcontext desired = cl::sycl::get_native<cl::sycl::backend::cnrt>(context());
-    CNdev bang_device = cl::sycl::get_native<cl::sycl::backend::cnrt>(device());
+    CNcontext desired = compat::get_native<CNcontext>(context());
+    CNdev bang_device = compat::get_native<CNdev>(device());
 
     // TODO: verify if this is right
     // in cnrt, a (driver api)CNcontext associated with a CPU thread, and (runtime api)cnrtRuntimeContext_t associated device
     // in CUDA, there is no runtime context(for user), only exsist (driver api)CUcontext
-    CHECK(BANG_EXECUTE_FUNC_S(cnCtxGetCurrent, &primary));
-    CHECK(BANG_EXECUTE_FUNC_S(cnCtxGetDevice, &device_current));
+    CNresult ret = cnCtxGetCurrent(&primary);
+    if(ret != CN_SUCCESS){
+        printf("%s@%d return %d FAILED\n",__func__, __LINE__,ret);
+    }
+    CNresult ret2 = cnCtxGetDevice(&device_current);
+    if(ret2 != CN_SUCCESS){
+        printf("%s@%d return %d FAILED\n",__func__, __LINE__,ret2);
+    }
+    // CHECK(BANG_EXECUTE_FUNC_S(cnCtxGetCurrent, &primary));
+    // CHECK(BANG_EXECUTE_FUNC_S(cnCtxGetDevice, &device_current));
     primary_context_ = primary == desired && device_current == bang_device;
 
     // CHECK(CUDA_EXECUTE_FUNC_S(cuDevicePrimaryCtxRetain, &primary, cuda_device));

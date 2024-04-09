@@ -328,10 +328,10 @@ static status_t bang_to_dnnl_status(CNresult bang_result) {
 
 #define BANG_ERROR_LOCATION __FILE__ " : " STRINGIFY(__LINE__)
 
+//cnrtSyncDevice();
 #define BANG_EXECUTE_FUNC(name, ...) \
     { \
         auto err = name(__VA_ARGS__); \
-        cnrtSyncDevice(); \
         if (err != CN_SUCCESS) { \
             throw bang_error(std::string("At :") \
                             + std::string(BANG_ERROR_LOCATION) \
@@ -341,10 +341,10 @@ static status_t bang_to_dnnl_status(CNresult bang_result) {
     }
 
 // Although stupid, syncdevice is necessary...
+// cnrtSyncDevice();
 #define CNNL_EXECUTE_FUNC(name, ...) \
     { \
         auto err = name(__VA_ARGS__); \
-        cnrtSyncDevice(); \
         if (err != CNNL_STATUS_SUCCESS) { \
             throw cnnl_error(std::string("At:") \
                             + std::string(BANG_ERROR_LOCATION) \
@@ -357,7 +357,7 @@ static status_t bang_to_dnnl_status(CNresult bang_result) {
 #define BANG_EXECUTE_FUNC_V(name, ...) \
     { \
         auto err = name(__VA_ARGS__); \
-        cnrtSyncDevice(); \
+         \
         if (err != CN_SUCCESS) { \
             std::cout << bang_error(std::string("At :") \
                             + std::string(BANG_ERROR_LOCATION) \
@@ -369,10 +369,10 @@ static status_t bang_to_dnnl_status(CNresult bang_result) {
     }
 
 // Although stupid, syncdevice is necessary...
+// cnrtSyncDevice();
 #define CNNL_EXECUTE_FUNC_V(name, ...) \
     { \
         auto err = name(__VA_ARGS__); \
-        cnrtSyncDevice(); \
         if (err != CNNL_STATUS_SUCCESS) { \
             std::cout << cnnl_error(std::string("At :") \
                             + std::string(BANG_ERROR_LOCATION) \
@@ -397,18 +397,18 @@ static status_t bang_to_dnnl_status(CNresult bang_result) {
         } \
     }
 
+// cnrtSyncDevice(); 
 #define BANG_EXECUTE_FUNC_S(name, ...) \
     [&]() { \
         auto err = name(__VA_ARGS__); \
-        cnrtSyncDevice(); \
         return bang_to_dnnl_status(err); \
     }()
 
 // Although stupid, syncdevice is necessary...
+        // cnrtSyncDevice(); 
 #define CNNL_EXECUTE_FUNC_S(name, ...) \
     [&]() { \
         auto err = name(__VA_ARGS__); \
-        cnrtSyncDevice(); \
         if (err != CNNL_STATUS_SUCCESS) { return cnnl_to_dnnl_status(err); } \
         return status::success; \
     }()

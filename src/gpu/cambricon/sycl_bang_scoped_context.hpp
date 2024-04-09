@@ -1,13 +1,11 @@
-#ifndef GPU_CAMBRICON_SYCL_BANG_CONTEXT_HPP
-#define GPU_CAMBRICON_SYCL_BANG_CONTEXT_HPP
+#ifndef GPU_CAMBRICON_SYCL_BANG_SCOPED_CONTEXT_HPP
+#define GPU_CAMBRICON_SYCL_BANG_SCOPED_CONTEXT_HPP
 
 #include <memory>
 #include <thread>
 
 #include <CL/sycl.hpp>
 #include <CL/sycl/backend/cnrt.hpp>   
-// #include <cnmlrt.h>
-#include <cn_api.h>
 
 #include "gpu/cambricon/sycl_bang_engine.hpp"
 #include "gpu/cambricon/sycl_bang_utils.hpp"

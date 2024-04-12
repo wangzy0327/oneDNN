@@ -108,11 +108,11 @@ inline std::vector<::sycl::device> get_sycl_devices(
     auto gpu_backend
             = backend == backend_t::unknown ? get_sycl_gpu_backend() : backend;
 
-    std::cout<<"!!!! vendor id : "<<vendor_id<<std::endl;
-    if(dev_type == ::sycl::info::device_type::gpu)
-        std::cout<<"!!!!! device type is : gpu"<<std::endl;
-    if(gpu_backend == backend_t::cambricon)
-        std::cout<<"!!!!!!! backend is : cambricon"<<std::endl;  
+    // std::cout<<"!!!! vendor id : "<<vendor_id<<std::endl;
+    // if(dev_type == ::sycl::info::device_type::gpu)
+    //     std::cout<<"!!!!! device type is : gpu"<<std::endl;
+    // if(gpu_backend == backend_t::cambricon)
+    //     std::cout<<"!!!!!!! backend is : cambricon"<<std::endl;  
 
     std::vector<::sycl::device> devices;
     auto platforms = ::sycl::platform::get_platforms();
@@ -122,15 +122,15 @@ inline std::vector<::sycl::device> get_sycl_devices(
         devices.insert(devices.end(), p_devices.begin(), p_devices.end());
     }
 
-    for(auto dev : devices){
-        std::cout<<"device vendor id : "<<dev.get_info<::sycl::info::device::vendor_id>()<<std::endl;
-        auto _dev_type = dev.get_info<::sycl::info::device::device_type>();
-        if(_dev_type == ::sycl::info::device_type::gpu)
-            std::cout<<"device type is : gpu"<<std::endl;
-        auto _backend = get_sycl_backend(dev);
-        if(_backend == backend_t::cambricon)
-            std::cout<<"backend is : cambricon"<<std::endl;
-    }
+    // for(auto dev : devices){
+    //     std::cout<<"device vendor id : "<<dev.get_info<::sycl::info::device::vendor_id>()<<std::endl;
+    //     auto _dev_type = dev.get_info<::sycl::info::device::device_type>();
+    //     if(_dev_type == ::sycl::info::device_type::gpu)
+    //         std::cout<<"device type is : gpu"<<std::endl;
+    //     auto _backend = get_sycl_backend(dev);
+    //     if(_backend == backend_t::cambricon)
+    //         std::cout<<"backend is : cambricon"<<std::endl;
+    // }
 
     devices.erase(std::remove_if(devices.begin(), devices.end(),
                           [=](const ::sycl::device &dev) {

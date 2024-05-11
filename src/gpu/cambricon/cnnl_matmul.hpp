@@ -165,6 +165,9 @@ struct cnnl_matmul_t : public primitive_t{
             = utils::downcast<cambricon::sycl_bang_stream_t *>(ctx.stream());
         
         return bang_stream->interop_task([&](::sycl::handler &cgh) {
+            // auto arg = &(ctx.input(DNNL_ARG_SRC) ? *(ctx.input(DNNL_ARG_SRC)->memory_storage()) 
+            //         : dnnl::impl::memory_storage_t::empty_storage());
+            // auto src_acc = utils::downcast<sycl::sycl_buffer_memory_storage_t *>(arg)->buffer().get_access<cl::sycl::access::mode::read>(cgh);
             auto src_acc = CTX_IN_ACCESSOR(DNNL_ARG_SRC);
             auto wt_acc = CTX_IN_ACCESSOR(DNNL_ARG_WEIGHTS);
             auto dst_acc = CTX_OUT_ACCESSOR(DNNL_ARG_DST);

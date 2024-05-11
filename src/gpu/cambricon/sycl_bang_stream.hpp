@@ -12,7 +12,7 @@ namespace impl {
 namespace gpu {
 namespace cambricon {
 
-// class sycl_bang_stream_t : public dnnl::impl::sycl::sycl_stream_t {
+class sycl_bang_stream_t : public dnnl::impl::sycl::sycl_stream_t {
 public:
     using base_t = dnnl::impl::sycl::sycl_stream_t;
     // cnnl_handle &get_cnnl_handle();

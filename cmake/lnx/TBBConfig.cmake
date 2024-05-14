@@ -92,7 +92,7 @@ else()
     endif()
 
     # try to find TBB in the system
-    find_library(_tbb_lib NAMES tbb
+    find_library(_tbb_lib NAMES tbb tbb_debug
         HINTS "${__tbb_hint_path}"
         PATH_SUFFIXES lib lib64)
     find_path(_tbb_inc NAMES tbb.h

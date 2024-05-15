@@ -457,10 +457,10 @@ static void quantize_array(cnnlHandle_t handle, cnnlTensorDescriptor_t tensor_de
     cnrtMalloc(&d_scale, sizeof(float));
     cnrtMalloc(&d_offset, sizeof(int));
 
-    // auto err1 = cnnlQuantizeParam(handle, CNNL_QUANTIZE_POSITION_SCALE, tensor_desc, _tensor,
-    //     bitwidth, workspace, workspace_size, d_position, d_scale, d_offset);
-    // if(err1 != CNNL_STATUS_SUCCESS)
-    //     assert(0 && "err1 at quantize_array");
+    auto err1 = cnnlQuantizeParam(handle, CNNL_QUANTIZE_POSITION_SCALE, tensor_desc, _tensor,
+        bitwidth, workspace, workspace_size, d_position, d_scale, d_offset);
+    if(err1 != CNNL_STATUS_SUCCESS)
+        assert(0 && "err1 at quantize_array");
 
     cnrtSyncDevice();
 

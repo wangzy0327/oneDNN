@@ -29,6 +29,11 @@
 #include "gpu/amd/sycl_hip_compat.hpp"
 #endif
 
+#ifdef DNNL_SYCL_BANG
+#include "gpu/cambricon/sycl_bang_compat.hpp"
+#endif
+
+
 namespace dnnl {
 namespace impl {
 namespace sycl {
@@ -51,6 +56,8 @@ class sycl_memory_arg_t {
     static constexpr auto be = ::sycl::backend::ext_oneapi_cuda;
 #elif defined(DNNL_SYCL_HIP)
     static constexpr auto be = ::sycl::backend::ext_oneapi_hip;
+#elif defined(DNNL_SYCL_BANG)
+    static constexpr auto be = ::sycl::backend::cnrt; 
 #else
     static_assert(false,
             "This file is not expected to be used for Intel GPU vendor.");
@@ -95,12 +102,17 @@ public:
 #ifdef DNNL_SYCL_HIP
             const gpu::amd::compat::interop_handle
 #endif
+#ifdef DNNL_SYCL_BANG
+            const gpu::cambricon::compat::interop_handle
+#endif
+
                     &ih) const {
         void *raw_ptr = nullptr;
         if (acc_.has_value()) {
             raw_ptr = reinterpret_cast<T *>(
                     reinterpret_cast<uint8_t *>(
-                            ih.get_native_mem<be>(acc_.value()))
+                            gpu::cambricon::compat::get_native_mem<void *>(ih, acc_.value()))
+                            // ih.get_native_mem<be>(acc_.value()))
                     + offset_);
         } else {
             raw_ptr = raw_ptr_;

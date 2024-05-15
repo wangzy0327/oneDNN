@@ -11,6 +11,7 @@
 #include "gpu/cambricon/sycl_bang_engine.hpp"
 #include "gpu/cambricon/sycl_bang_scoped_context.hpp"
 #include "gpu/cambricon/sycl_bang_stream.hpp"
+#include "sycl/sycl_memory_storage_helper.hpp"
 
 #include<stdio.h>
 

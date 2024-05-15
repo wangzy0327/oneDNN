@@ -30,6 +30,8 @@
 #include <memory>
 #include <string>
 #include <tuple>
+#include <iostream>
+#include <typeinfo> 
 
 #define MSAN_ENABLED 0
 #define ATTR_NO_MSAN
@@ -471,6 +473,8 @@ private:
 
 template <typename derived_type, typename base_type>
 inline derived_type downcast(base_type *base) {
+    const std::type_info& type = typeid(*base);
+    std::cout<<"The actual type is : "<<type.name()<<std::endl;
     assert(dynamic_cast<derived_type>(base) == base);
     return static_cast<derived_type>(base);
 }

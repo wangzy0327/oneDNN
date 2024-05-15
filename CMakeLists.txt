@@ -64,6 +64,10 @@ if(POLICY CMP0082)
     cmake_policy(SET CMP0082 NEW)
 endif()
 
+ADD_DEFINITIONS(
+    -Wno-unused-function -Wno-unused-variable -Wno-enum-compare
+)
+
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
     message(STATUS "CMAKE_BUILD_TYPE is unset, defaulting to Release")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING

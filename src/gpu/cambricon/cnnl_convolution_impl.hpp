@@ -830,6 +830,7 @@ protected:
         CNNL_EXECUTE_FUNC_V(cnnlConvolutionBackwardData, handle, &alpha,
                 quantized_weight_desc, d_q_wei, quantized_dst_desc, d_q_g_dst, conv_desc, bwd_algo,
                 scratchpad_conv, scratchpad_size_conv, &beta, descs[io::x], x);
+        std::cout<<"cnnl_impl with_bias flag is : "<<with_bias<<std::endl;
         if (with_bias) {
             // TODO: check this, convolution backward have bias?
             void* scratchpad_bias = scratchpad_size_bias > 0 ? scratchpad : nullptr;

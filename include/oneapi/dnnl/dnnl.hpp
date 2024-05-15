@@ -639,6 +639,10 @@ enum class algorithm {
     reduction_norm_lp_power_p_max = dnnl_reduction_norm_lp_power_p_max,
     /// Reduction using norm_lp_power_p_sum operation
     reduction_norm_lp_power_p_sum = dnnl_reduction_norm_lp_power_p_sum,
+    /// Softmax, numerically stable
+    softmax_accurate = dnnl_softmax_accurate,
+    /// LogSoftmax, numerically stable
+    softmax_log = dnnl_softmax_log,
 };
 
 /// Converts algorithm kind enum value from C++ API to C API type.

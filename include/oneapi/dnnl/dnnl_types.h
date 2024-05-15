@@ -1544,6 +1544,10 @@ typedef enum {
     dnnl_reduction_norm_lp_power_p_max,
     /// Reduction using lp norm without final pth-root
     dnnl_reduction_norm_lp_power_p_sum,
+    /// Softmax
+    dnnl_softmax_accurate = 0x30000,
+    /// Logsoftmax
+    dnnl_softmax_log,
 } dnnl_alg_kind_t;
 
 /// Flags for normalization primitives.

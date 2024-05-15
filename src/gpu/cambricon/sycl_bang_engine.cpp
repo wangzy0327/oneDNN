@@ -78,9 +78,10 @@ status_t sycl_bang_engine_t::set_cnnl_handle() {
             std::unique_ptr<cnnlHandle_t, void (*)(cnnlHandle_t *)>(
                     new cnnlHandle_t(handle), [](cnnlHandle_t *h) {
                         if (h != nullptr){
-                            cnnlStatus_t err = cnnlDestroy(*h);
-                            if (err != CNNL_STATUS_SUCCESS) { return cnnl_to_dnnl_status(err); }
+                            // cnnlStatus_t err = cnnlDestroy(*h);
+                            // if (err != CNNL_STATUS_SUCCESS) { return cnnl_to_dnnl_status(err); }
                             // CNNL_EXECUTE_FUNC_V(cnnlDestroy, *h);
+                            CNNL_EXECUTE_FUNC_V(cnnlDestroy, *h);
                         }
                         delete h;
                     }));

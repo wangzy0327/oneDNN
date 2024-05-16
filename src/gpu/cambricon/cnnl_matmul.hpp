@@ -76,7 +76,6 @@ struct cnnl_matmul_t : public primitive_t{
         // C_dims[0] = M; C_dims[1] = N;
 
         with_bias_ = pd->with_bias();
-        std::cout<<"init with_bias_ flag is : "<<with_bias_<<std::endl;
         if(with_bias_)
         {   
             Bias_dims[0] = C_dims[is_batched_ + 1];
@@ -122,7 +121,7 @@ struct cnnl_matmul_t : public primitive_t{
     }
 
     status_t init_scratchpad(engine_t *engine) {
-        std::cout<<"init scratchpad"<<std::endl;
+        // std::cout<<"init scratchpad"<<std::endl;
         auto &sycl_engine = *utils::downcast<sycl_bang_engine_t *>(engine);
         stream_t *service_stream;
         CHECK(sycl_engine.get_service_stream(service_stream));
@@ -133,14 +132,14 @@ struct cnnl_matmul_t : public primitive_t{
         scratchpad_size = 0;
         // CHECK(CNNL_EXECUTE_FUNC_S(cnnlGetBiasAddWorkspaceSize, handle,
         //         Bias_desc, C_desc, &scratchpad_size_biasadd));
-        std::cout<<"init biasAdd scratchpad size is "<<scratchpad_size_biasadd<<std::endl;        
+        // std::cout<<"init biasAdd scratchpad size is "<<scratchpad_size_biasadd<<std::endl;        
         scratchpad_size = std::max(scratchpad_size_biasadd, scratchpad_size);
 
         CHECK(CNNL_EXECUTE_FUNC_S(cnnlGetQuantizeParamWorkspaceSize, handle, A_desc, &scratchpad_size_qA));
-        std::cout<<"init cnnlGetQuantizeParam scratchpad_size_qA size is "<<scratchpad_size_qA<<std::endl;        
+        // std::cout<<"init cnnlGetQuantizeParam scratchpad_size_qA size is "<<scratchpad_size_qA<<std::endl;        
         scratchpad_size = std::max(scratchpad_size_qA, scratchpad_size);
         CHECK(CNNL_EXECUTE_FUNC_S(cnnlGetQuantizeParamWorkspaceSize, handle, B_desc, &scratchpad_size_qB));
-        std::cout<<"init cnnlGetQuantizeParam scratchpad_size_qB size is "<<scratchpad_size_qB<<std::endl;        
+        // std::cout<<"init cnnlGetQuantizeParam scratchpad_size_qB size is "<<scratchpad_size_qB<<std::endl;        
         scratchpad_size = std::max(scratchpad_size_qB, scratchpad_size);
 
         // TODO: compare with the way to allocate scratchpad in other kernels.
@@ -170,9 +169,6 @@ struct cnnl_matmul_t : public primitive_t{
             = utils::downcast<cambricon::sycl_bang_stream_t *>(ctx.stream());
         
         return bang_stream->interop_task([&](::sycl::handler &cgh) {
-            // auto arg = &(ctx.input(DNNL_ARG_SRC) ? *(ctx.input(DNNL_ARG_SRC)->memory_storage()) 
-            //         : dnnl::impl::memory_storage_t::empty_storage());
-            // auto src_acc = utils::downcast<sycl::sycl_buffer_memory_storage_t *>(arg)->buffer().get_access<cl::sycl::access::mode::read>(cgh);
             // auto src_acc = CTX_IN_ACCESSOR(DNNL_ARG_SRC);
             // auto wt_acc = CTX_IN_ACCESSOR(DNNL_ARG_WEIGHTS);
             // auto dst_acc = CTX_OUT_ACCESSOR(DNNL_ARG_DST);
@@ -184,10 +180,6 @@ struct cnnl_matmul_t : public primitive_t{
                     
             if(with_bias_)
             {
-                std::cout<<"with bias"<<std::endl;
-                // bias_acc = std::make_shared<
-                //         ::sycl::accessor<uint8_t, 1, ::sycl::access::mode::read>>(
-                //         CTX_IN_ACCESSOR(DNNL_ARG_BIAS));
                 arg_bias_ptr = std::make_shared<impl::sycl::sycl_memory_arg_t<::sycl::access::mode::read>>(CTX_IN_SYCL_MEMORY(DNNL_ARG_BIAS));
             }
             using scratch_arg_t = impl::sycl::sycl_memory_arg_t<::sycl::access::mode::read_write>;
@@ -245,7 +237,6 @@ struct cnnl_matmul_t : public primitive_t{
                     quantize_array(handle, B_desc, B, 16, scratchpad_qB, scratchpad_size_qB, quantized_B_desc, d_q_B);
                 if(is_batched_)
                 {
-                    std::cout<<"matmul is batched !"<<std::endl;
                     if(scratchpad_qA && scratchpad_qB){
                         std::cout<<"matmul batched quantized !"<<std::endl;
                         CNNL_EXECUTE_FUNC(cnnlBatchMatMul, handle, transA_, transB_, 
@@ -258,7 +249,6 @@ struct cnnl_matmul_t : public primitive_t{
                 }
                 else
                 {
-                    std::cout<<"matmul is no batched !"<<std::endl;
                     if(scratchpad_qA && scratchpad_qB){
                         std::cout<<"matmul no batched quantized !"<<std::endl;
                         CNNL_EXECUTE_FUNC(cnnlMatMul, handle, transA_, transB_, &mm_alpha,

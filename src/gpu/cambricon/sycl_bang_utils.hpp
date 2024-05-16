@@ -40,24 +40,6 @@ namespace cambricon {
             ->buffer() \
             .get_access<cl::sycl::access::mode::read_write>(cgh)
 
-// #define CTX_OUT_ACCESSOR(arg) \
-//     utils::downcast<sycl::sycl_usm_memory_storage_t *>( \
-//             &CTX_OUT_STORAGE(arg)) \
-//             ->buffer() \
-//             .get_access<cl::sycl::access::mode::write>(cgh)            
-
-// #define CTX_IN_ACCESSOR(arg) \
-//     utils::downcast<sycl::sycl_usm_memory_storage_t *>( \
-//             &CTX_IN_STORAGE(arg)) \
-//             ->buffer() \
-//             .get_access<cl::sycl::access::mode::read>(cgh)
-
-// #define CTX_SCRATCH_ACCESSOR(arg) \
-//     utils::downcast<sycl::sycl_usm_memory_storage_t *>( \
-//             ctx.get_scratchpad_grantor().get_memory_storage(arg).get()) \
-//             ->buffer() \
-//             .get_access<cl::sycl::access::mode::read_write>(cgh)
-
 
 bool compare_bang_devices(
         const cl::sycl::device &lhs, const cl::sycl::device &rhs);

@@ -173,29 +173,28 @@ struct cnnl_matmul_t : public primitive_t{
             // auto arg = &(ctx.input(DNNL_ARG_SRC) ? *(ctx.input(DNNL_ARG_SRC)->memory_storage()) 
             //         : dnnl::impl::memory_storage_t::empty_storage());
             // auto src_acc = utils::downcast<sycl::sycl_buffer_memory_storage_t *>(arg)->buffer().get_access<cl::sycl::access::mode::read>(cgh);
-            auto src_acc = CTX_IN_ACCESSOR(DNNL_ARG_SRC);
-            auto wt_acc = CTX_IN_ACCESSOR(DNNL_ARG_WEIGHTS);
-            auto dst_acc = CTX_OUT_ACCESSOR(DNNL_ARG_DST);
-            std::shared_ptr<
-                    ::sycl::accessor<uint8_t, 1, ::sycl::access::mode::read>>
-                    bias_acc;
+            // auto src_acc = CTX_IN_ACCESSOR(DNNL_ARG_SRC);
+            // auto wt_acc = CTX_IN_ACCESSOR(DNNL_ARG_WEIGHTS);
+            // auto dst_acc = CTX_OUT_ACCESSOR(DNNL_ARG_DST);
+
+            auto arg_wt = CTX_IN_SYCL_MEMORY(DNNL_ARG_WEIGHTS);
+            auto arg_src = CTX_IN_SYCL_MEMORY(DNNL_ARG_SRC);
+            auto arg_dst = CTX_OUT_SYCL_MEMORY(DNNL_ARG_DST);
+            std::shared_ptr<impl::sycl::sycl_memory_arg_t<::sycl::access::mode::read>> arg_bias_ptr;
+                    
             if(with_bias_)
             {
                 std::cout<<"with bias"<<std::endl;
-                bias_acc = std::make_shared<
-                        ::sycl::accessor<uint8_t, 1, ::sycl::access::mode::read>>(
-                        CTX_IN_ACCESSOR(DNNL_ARG_BIAS));
+                // bias_acc = std::make_shared<
+                //         ::sycl::accessor<uint8_t, 1, ::sycl::access::mode::read>>(
+                //         CTX_IN_ACCESSOR(DNNL_ARG_BIAS));
+                arg_bias_ptr = std::make_shared<impl::sycl::sycl_memory_arg_t<::sycl::access::mode::read>>(CTX_IN_SYCL_MEMORY(DNNL_ARG_BIAS));
             }
-
-            using scratch_acc_t = ::sycl::accessor<uint8_t, 1, ::sycl::access::mode::read_write>;
-            std::shared_ptr<scratch_acc_t> p_scratch_acc;
-
+            using scratch_arg_t = impl::sycl::sycl_memory_arg_t<::sycl::access::mode::read_write>;
+            std::shared_ptr<scratch_arg_t> arg_scratch_ptr;
             if (scratchpad_size > 0) {
-                std::cout<<"scratchped size > 0"<<std::endl;
-                p_scratch_acc = std::make_shared<scratch_acc_t>(
-                        scratch_buff_
-                                ->get_access<::sycl::access::mode::read_write>(
-                                        cgh));
+                arg_scratch_ptr = std::make_shared<scratch_arg_t>(impl::sycl::sycl_memory_arg_t<
+                    ::sycl::access::mode::read_write>(*scratch_buff_, cgh));
             }
             
             cnnlHandle_t handle = bang_stream->get_cnnl_handle();
@@ -204,16 +203,23 @@ struct cnnl_matmul_t : public primitive_t{
                 auto &sycl_engine = *utils::downcast<sycl_bang_engine_t *>(bang_stream->engine());
                 auto sc = bang_sycl_scoped_context_handler_t(sycl_engine);
             
-                auto A = sc.memory<float *>(ih, src_acc);
-                auto B = sc.memory<float *>(ih, wt_acc);  
-                auto C = sc.memory<float *>(ih, dst_acc);
+                // auto A = sc.memory<float *>(ih, src_acc);
+                // auto B = sc.memory<float *>(ih, wt_acc);  
+                // auto C = sc.memory<float *>(ih, dst_acc);
+
+                auto A = arg_src.get_native_pointer(ih);
+                auto B = arg_wt.get_native_pointer(ih);  
+                auto C = arg_dst.get_native_pointer(ih);
+
                 void* bias = nullptr;
                 if(with_bias_)
-                    bias = sc.memory<float *>(ih, *bias_acc);
+                    bias = arg_bias_ptr->get_native_pointer(ih);
+                    // bias = sc.memory<float *>(ih, *bias_acc);
 
                 void* scratchpad = nullptr;
                 if(scratchpad_size > 0)
-                    scratchpad = sc.memory<float *>(ih, *p_scratch_acc);
+                    scratchpad = arg_scratch_ptr->get_native_pointer(ih);
+                    // scratchpad = sc.memory<float *>(ih, *p_scratch_acc);
 
                 // quantization
                 // These quantized tensors should be saved for backward, but not implemented yet

@@ -175,7 +175,7 @@ struct cnnl_pooling_fwd_impl_t : public cnnl_pooling_impl_base_t {
         auto handle = bang_stream->get_cnnl_handle();
 
         // allocate workspace, TODO: distinguish the outH and outW parameter by datalayout
-        assert(dst_format == CNNL_LAYOUT_NHWC);
+        assert(dst_format == CNNL_LAYOUT_NHWC || dst_format == CNNL_LAYOUT_NCHW);
         CNNL_EXECUTE_FUNC(cnnlGetPoolingWorkspaceSize, handle, pool_mode_, dims_[io::dst][2], dims_[io::dst][1], &scratchpad_size);
         
         if (scratchpad_size > 0)

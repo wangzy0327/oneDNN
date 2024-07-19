@@ -141,7 +141,9 @@ static status_t get_format(const memory_desc_t *md, cnnlTensorLayout_t &format,
     } else if (mem_wrapper.matches_one_of_tag(
                        format_tag::acb, format_tag::acdb, format_tag::acdeb)) {
         format = cnnlTensorLayout_t::CNNL_LAYOUT_NHWC;
-    } else if (mem_wrapper.matches_one_of_tag(format_tag::ndhwc)) {
+    } else if (mem_wrapper.matches_one_of_tag(format_tag::ncdhw)) {
+        format = cnnlTensorLayout_t::CNNL_LAYOUT_NCDHW;
+    }else if (mem_wrapper.matches_one_of_tag(format_tag::ndhwc)) {
         format = cnnlTensorLayout_t::CNNL_LAYOUT_NDHWC;
     } else if (mem_wrapper.matches_one_of_tag(format_tag::any)) {
         format = cnnlTensorLayout_t::CNNL_LAYOUT_ARRAY;

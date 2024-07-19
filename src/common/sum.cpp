@@ -28,6 +28,7 @@
 #include "utils.hpp"
 
 #include "sum_pd.hpp"
+#include <iostream>
 
 using namespace dnnl::impl;
 using namespace dnnl::impl::utils;
@@ -46,7 +47,7 @@ status_t sum_primitive_desc_create(primitive_desc_iface_t **sum_pd_iface,
         engine_t *engine) {
 
     VCHECK_SUM(!any_null(sum_pd_iface, src_mds, scales) && n > 0,
-            VERBOSE_NULL_ARG);
+            VERBOSE_NULL_ARG);           
 
     if (attr == nullptr) attr = &default_attr();
 

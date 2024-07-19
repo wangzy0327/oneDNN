@@ -55,25 +55,39 @@ void reorder_example(dnnl::engine::kind engine_kind) {
     // Tensor dimensions.
     const memory::dim N = 3, // batch size
             IC = 3, // channels
-            IH = 227, // tensor height
-            IW = 227; // tensor width
+            IH = 2, // tensor height
+            IW = 2; // tensor width
+            // IH = 227, // tensor height
+            // IW = 227; // tensor width
 
     // Source (src) and destination (dst) tensors dimensions.
     memory::dims src_dims = {N, IC, IH, IW};
 
     // Allocate buffers.
     std::vector<float> src_data(product(src_dims));
-    std::vector<int8_t> dst_data(product(src_dims));
+    std::vector<float> dst_data(product(src_dims));
+    // std::vector<int8_t> dst_data(product(src_dims));
 
     // Initialize src tensor.
     std::generate(src_data.begin(), src_data.end(), []() {
         static int i = 0;
-        return std::cos(i++ / 10.f);
+        return i++;
+        // return std::cos(i++ / 10.f);
     });
+    int num = std::min(src_data.size(),static_cast<size_t>(100));
+    for(int i = 0;i < num;i++){
+        if(i == 0)
+            std::cout<<"[ ";
+        if(i != num - 1)
+            std::cout<<src_data[i]<<",";
+        else if(i == num - 1)
+            std::cout<<src_data[i]<<" ]"<<std::endl;
+    }    
 
     // Create memory descriptors and memory objects for src and dst.
     auto src_md = memory::desc(src_dims, dt::f32, tag::nchw);
-    auto dst_md = memory::desc(src_dims, dt::s8, tag::nhwc);
+    auto dst_md = memory::desc(src_dims, dt::f32, tag::nhwc);
+    // auto dst_md = memory::desc(src_dims, dt::s8, tag::nhwc);
 
     auto src_mem = memory(src_md, engine);
     auto dst_mem = memory(dst_md, engine);
@@ -92,14 +106,15 @@ void reorder_example(dnnl::engine::kind engine_kind) {
     const int ic_dim = 1;
 
     // Create primitive post-ops (per-channel output scales)
-    primitive_attr reorder_attr;
-    reorder_attr.set_scales_mask(DNNL_ARG_DST, 1 << ic_dim);
-    auto dst_scales_mem = memory({{IC}, dt::f32, tag::x}, engine);
-    write_to_dnnl_memory(scales.data(), dst_scales_mem);
+    // primitive_attr reorder_attr;
+    // reorder_attr.set_scales_mask(DNNL_ARG_DST, 1 << ic_dim);
+    // auto dst_scales_mem = memory({{IC}, dt::f32, tag::x}, engine);
+    // write_to_dnnl_memory(scales.data(), dst_scales_mem);
 
     // Create primitive descriptor.
     auto reorder_pd = reorder::primitive_desc(
-            engine, src_md, engine, dst_md, reorder_attr);
+            engine, src_md, engine, dst_md);
+            // engine, src_md, engine, dst_md, reorder_attr);
 
     // Create the primitive.
     auto reorder_prim = reorder(reorder_pd);
@@ -108,7 +123,7 @@ void reorder_example(dnnl::engine::kind engine_kind) {
     std::unordered_map<int, memory> reorder_args;
     reorder_args.insert({DNNL_ARG_SRC, src_mem});
     reorder_args.insert({DNNL_ARG_DST, dst_mem});
-    reorder_args.insert({DNNL_ARG_ATTR_SCALES | DNNL_ARG_DST, dst_scales_mem});
+    // reorder_args.insert({DNNL_ARG_ATTR_SCALES | DNNL_ARG_DST, dst_scales_mem});
 
     // Primitive execution: reorder with scaled sum.
     reorder_prim.execute(engine_stream, reorder_args);
@@ -118,6 +133,15 @@ void reorder_example(dnnl::engine::kind engine_kind) {
 
     // Read data from memory object's handle.
     read_from_dnnl_memory(dst_data.data(), dst_mem);
+    num = std::min(dst_data.size(),static_cast<size_t>(100));
+    for(int i = 0;i < num;i++){
+        if(i == 0)
+            std::cout<<"[ ";
+        if(i != num - 1)
+            std::cout<<dst_data[i]<<",";
+        else if(i == num - 1)
+            std::cout<<dst_data[i]<<" ]"<<std::endl;
+    }    
 }
 
 int main(int argc, char **argv) {

@@ -51,10 +51,15 @@ status_t cnnl_reorder_t::execute(const exec_ctx_t &ctx) const {
             void *src_ = arg_src.get_native_pointer(ih);
             void *dst_ = arg_dst.get_native_pointer(ih);
 
-            void *src_sc = arg_src_scale.get_native_pointer(ih);
-            void *dst_sc = arg_dst_scale.get_native_pointer(ih);
+            auto a = static_cast<uint8_t *>(src_)
+                    + pd()->reorder_->src_offset_in_bytes();
+            auto b = static_cast<uint8_t *>(dst_)
+                    + pd()->reorder_->dst_offset_in_bytes();
 
-            pd()->reorder_->execute(handle, src_sc, dst_sc);
+        //     void *src_sc = arg_src_scale.get_native_pointer(ih);
+        //     void *dst_sc = arg_dst_scale.get_native_pointer(ih);
+
+            pd()->reorder_->execute(handle, a, b);
         });
     });
 }

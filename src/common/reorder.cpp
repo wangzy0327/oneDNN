@@ -26,6 +26,7 @@
 #include "utils.hpp"
 
 #include "reorder_pd.hpp"
+#include <iostream>
 
 using namespace dnnl::impl;
 using namespace dnnl::impl::utils;
@@ -133,7 +134,6 @@ status_t dnnl_reorder_primitive_desc_create(
         const primitive_attr_t *attr) {
     if (any_null(reorder_pd_iface, src_engine, src_md, dst_engine, dst_md))
         return invalid_arguments;
-
     std::shared_ptr<primitive_desc_t> pd;
     auto e = get_reorder_engine(src_engine, dst_engine);
     CHECK(reorder_primitive_desc_create(

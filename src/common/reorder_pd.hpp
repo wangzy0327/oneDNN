@@ -166,6 +166,36 @@ protected:
     }
 };
 
+#define DECLARE_SUM_PD_t(impl_name, ...) \
+    static status_t create(sum_pd_t **sum_pd, engine_t *engine, \
+            const primitive_attr_t *attr, const memory_desc_t *dst_md, int n, \
+            const float *scales, const memory_desc_t *const *src_mds) { \
+        using namespace status; \
+        auto _pd = new pd_t(attr, dst_md, n, scales, src_mds); \
+        if (_pd == nullptr) return out_of_memory; \
+        if (_pd->init(engine) != success) { \
+            delete _pd; \
+            return unimplemented; \
+        } \
+        CHECK(_pd->init_scratchpad_md()); \
+        return safe_ptr_assign(*sum_pd, _pd); \
+    } \
+    status_t create_primitive( \
+            std::pair<std::shared_ptr<primitive_t>, bool> &primitive, \
+            engine_t *engine, const cache_blob_t &cache_blob) const override { \
+        return primitive_t::create_primitive_common<__VA_ARGS__, pd_t>( \
+                primitive, this, engine, false, cache_blob); \
+    } \
+    pd_t *clone() const override { \
+        auto new_pd = utils::make_unique<pd_t>(*this); \
+        if (!new_pd->is_initialized()) return nullptr; \
+        return new_pd.release(); \
+    } \
+    const char *name() const override { return impl_name; }
+
+#define DECLARE_SUM_PD_T(impl_name, ...) \
+    DECLARE_SUM_PD_t(impl_name, __VA_ARGS__)
+
 } // namespace impl
 } // namespace dnnl
 

@@ -60,7 +60,7 @@ struct cnnl_reorder_t : public primitive_t {
 
             if (!ok) return false;
 
-            // Nvidia only supports blocking for Int8
+            // Cambricon only supports blocking for Int8
             if (!utils::one_of(src_md()->data_type, data_type::s8)
                     && src_md()->format_desc.blocking.inner_nblks > 0)
                 return false;
@@ -68,7 +68,7 @@ struct cnnl_reorder_t : public primitive_t {
                     && dst_md()->format_desc.blocking.inner_nblks > 0)
                 return false;
 
-            // Nvidia supports blocking only on channel dimension C
+            // Cambricon supports blocking only on channel dimension C
             if (dst_md()->format_desc.blocking.inner_nblks > 1
                     || src_md()->format_desc.blocking.inner_nblks > 1)
                 return false;
@@ -116,7 +116,7 @@ struct cnnl_reorder_t : public primitive_t {
                 assert("reorder not support different block in cnnl" && 0);
                 status::unimplemented;
             } else {
-                reorder_.reset(new cnnl_reorder_stride_t());
+                reorder_.reset(new cnnl_reorder_ex_t());
             }
 
             return reorder_->init(this);
